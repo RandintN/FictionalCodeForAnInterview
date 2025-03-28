@@ -1,15 +1,15 @@
 public class RomanNumeralGenerator {
     public static Object romanFor(int decimal) {
-        String roman = "";
+        StringBuilder roman = new StringBuilder();
 
         for (RomanToDecimal romanToDecimal : RomanToDecimal.values()) {
             while (decimal >= romanToDecimal.decimal) {
-                roman += romanToDecimal.roman;
+                roman.append(romanToDecimal.roman);
                 decimal -= romanToDecimal.decimal;
             }
         }
 
-        return roman;
+        return roman.toString();
     }
 
     enum RomanToDecimal {
