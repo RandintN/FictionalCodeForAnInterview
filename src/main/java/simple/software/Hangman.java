@@ -1,16 +1,23 @@
 package simple.software;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Hangman {
+    public static final String PATH = "C:\\Coding\\WordSource.txt";
+    public static final int MAX_TRIALS = 10;
+
     private final Set<String> usedWordsSet = new HashSet<>();
     private final List<String> wordsList = new ArrayList<>();
+
+    public int remainingTrials;
+    public int score;
+
 
     public int countCharactersInAWord(String word, char alphabetCharacter) {
         return (int) word.chars()
@@ -28,6 +35,8 @@ public class Hangman {
     }
 
     public String fetchWord(int requestedLength) {
+        remainingTrials = MAX_TRIALS;
+
         for (String result : wordsList) {
             if (result.length() != requestedLength) continue;
             else if (usedWordsSet.add(result)) return result;
@@ -36,15 +45,16 @@ public class Hangman {
     }
 
     public void loadWords() {
-        String word;
+        var path = Paths.get(PATH);
 
-        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Coding\\WordSource.txt"))) {
-            while ((word = br.readLine()) != null) {
-                wordsList.add(word);
-            }
+        try (var lines = Files.lines(path)) {
+            lines.map(String::trim)
+                    .filter(trim -> !trim.isEmpty())
+                    .forEach(wordsList::add);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(); // logging later
         }
+
     }
 
     public String fetchClue(String word) {
@@ -52,11 +62,17 @@ public class Hangman {
     }
 
     public String fetchClue(String word, String clue, char guess) {
+        remainingTrials--;
+
+        if (guess >= 'A' && guess <= 'Z') guess += 32;
+        if (guess < 'a' || guess > 'z') throw new IllegalArgumentException("Blah");
+
         StringBuilder newClue = new StringBuilder();
 
         for (int i = 0; i < word.length(); i++) {
             if (guess == word.charAt(i) && guess != clue.charAt(i)) {
                 newClue.append(guess);
+                score += MAX_TRIALS / word.length();
             } else {
                 newClue.append(clue.charAt(i));
             }

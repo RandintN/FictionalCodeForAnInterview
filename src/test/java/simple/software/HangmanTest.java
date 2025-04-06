@@ -1,12 +1,16 @@
 package simple.software;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
 import java.util.HashSet;
 import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.DisplayNameGenerator.*;
+import static simple.software.Hangman.MAX_TRIALS;
 
+@DisplayNameGeneration(ReplaceUnderscores.class)
+@DisplayName("Testes para o jogo da forca")
 public class HangmanTest {
 
     static Random random;
@@ -23,6 +27,7 @@ public class HangmanTest {
     @BeforeEach
     void setUp() {
         requestedLength = random.nextInt(6) + 5;
+        hangmanUnderTest.score = 0;
     }
 
     @Test
@@ -120,5 +125,44 @@ public class HangmanTest {
 
         // Assert
         assertThat(actualNewClue).isEqualTo(expectedClue);
+    }
+
+    @Test
+    void test_whenInvalidGuessThenFetchCLueThrowsException() {
+        assertThatThrownBy(() -> hangmanUnderTest.fetchClue("pizza", "-----", '1'))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Blah");
+    }
+
+    @Test
+    void test_remainingTrialsBeforeAnyGuess() {
+        hangmanUnderTest.fetchWord(requestedLength);
+        assertThat(MAX_TRIALS).isEqualTo(hangmanUnderTest.remainingTrials);
+    }
+
+    @Test
+    void make_a_guess() {
+        hangmanUnderTest.fetchWord(requestedLength);
+        hangmanUnderTest.fetchClue("pizza", "-----", 'a');
+
+        assertThat(MAX_TRIALS - 1).isEqualTo(hangmanUnderTest.remainingTrials);
+    }
+
+    @Test
+    void score_before_any_guess() {
+        hangmanUnderTest.fetchWord(requestedLength);
+
+        assertThat(hangmanUnderTest.score).isEqualTo(0);
+    }
+
+    @Test
+    void test_score_after_correct_guess() {
+        String word = "pizza";
+        String clue = "-----";
+        char guess = 'a';
+
+        hangmanUnderTest.fetchClue(word, clue, guess);
+
+        assertThat(hangmanUnderTest.score).isEqualTo(MAX_TRIALS / word.length());
     }
 }
