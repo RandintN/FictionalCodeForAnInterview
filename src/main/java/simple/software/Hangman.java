@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.Set;
 
 public class Hangman {
+    public ScoreDB scoreDB = new ScoreDB();
+
     public static final String PATH = "C:\\Coding\\WordSource.txt";
     public static final int MAX_TRIALS = 10;
 
     private final Set<String> usedWordsSet = new HashSet<>();
-    private final List<String> wordsList = new ArrayList<>();
+    final List<String> wordsList = new ArrayList<>();
 
     public int remainingTrials;
     public int score;
@@ -79,4 +81,8 @@ public class Hangman {
         }
         return newClue.toString();
     }
+
+    public boolean saveScore(WordScore wordScore) {
+        return scoreDB.writeScoreDB(wordScore);
+    };
 }

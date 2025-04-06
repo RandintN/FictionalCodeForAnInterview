@@ -1,12 +1,16 @@
 package simple.software;
 
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.DisplayNameGenerator.*;
+import static org.mockito.Mockito.when;
 import static simple.software.Hangman.MAX_TRIALS;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
@@ -164,5 +168,58 @@ public class HangmanTest {
         hangmanUnderTest.fetchClue(word, clue, guess);
 
         assertThat(hangmanUnderTest.score).isEqualTo(MAX_TRIALS / word.length());
+    }
+
+    @Test
+    void test_string() {
+        assertThat(hangmanUnderTest.wordsList).contains("pizza").hasSizeGreaterThan(5);
+        assertThat(5).isGreaterThan(10);
+    }
+
+    @Test
+    void testMapAssertions() {
+        Map<String, Integer> ages = new HashMap<>(Map.of("Alice", 30, "Bob", 25));
+
+        assertThat(ages)
+                .hasSize(2)
+                .containsKeys("Alice", "Bob")
+                .containsEntry("Alice", 30)
+                .doesNotContainEntry("Charlie", 40);
+    }
+
+    @Test
+    void save_score() {
+        assertThat(hangmanUnderTest.saveScore(new WordScore("apple", 10))).isEqualTo(true);
+    }
+
+    @Test
+    void test_writeScoreDB() {
+        final var wordScore = new WordScore("apple", 8);
+        hangmanUnderTest.saveScore(wordScore);
+
+        assertThat(hangmanUnderTest.scoreDB.readScoreDB("apple")).isEqualTo(8);
+    }
+
+    @Test
+    void test_writeScoreDBCalled() {
+        hangmanUnderTest.scoreDB.writeScoreDBCalled = false;
+
+        final var wordScore = new WordScore("apple", 8);
+        hangmanUnderTest.saveScore(wordScore);
+
+        assertThat(hangmanUnderTest.scoreDB.writeScoreDBCalled).isTrue();
+    }
+
+    @Test
+    void blah_withMock() {
+        final var mockObject = Mockito.mock(ExternalDBMock.class);
+
+        final var objectUnderTest = new ObjectUnderTest(mockObject);
+
+        when(mockObject.getValue("abc")).thenReturn(9);
+        when(mockObject.getValue("def")).thenReturn(7);
+        when(mockObject.getValue("xyz")).thenReturn(10);
+
+        assertThat(objectUnderTest.getTotalValues()).isEqualTo(26);
     }
 }
