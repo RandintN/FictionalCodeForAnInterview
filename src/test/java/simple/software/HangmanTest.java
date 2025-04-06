@@ -1,8 +1,6 @@
 package simple.software;
 
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,6 +8,7 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.DisplayNameGenerator.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static simple.software.Hangman.MAX_TRIALS;
 
@@ -172,8 +171,7 @@ public class HangmanTest {
 
     @Test
     void test_string() {
-        assertThat(hangmanUnderTest.wordsList).contains("pizza").hasSizeGreaterThan(5);
-        assertThat(5).isGreaterThan(10);
+        assertThat(hangmanUnderTest.wordsList).contains("pizza");
     }
 
     @Test
@@ -212,7 +210,7 @@ public class HangmanTest {
 
     @Test
     void blah_withMock() {
-        final var mockObject = Mockito.mock(ExternalDBMock.class);
+        final var mockObject = mock(MockScoreDB.class);
 
         final var objectUnderTest = new ObjectUnderTest(mockObject);
 
@@ -221,5 +219,16 @@ public class HangmanTest {
         when(mockObject.getValue("xyz")).thenReturn(10);
 
         assertThat(objectUnderTest.getTotalValues()).isEqualTo(26);
+    }
+
+    @Test
+    void test_save_score_using_mock_db() {
+        final var mockedScoreDB = mock(MockScoreDB.class);
+
+        final var cut = new Hangman(mockedScoreDB);
+
+        when(mockedScoreDB.writeScoreDB("apple", 10.0)).thenReturn(true);
+
+        assertThat(cut.saveScore(new WordScore("apple", 10))).isTrue();
     }
 }

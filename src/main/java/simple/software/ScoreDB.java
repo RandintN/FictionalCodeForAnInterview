@@ -19,6 +19,8 @@ public class ScoreDB {
     }
 }
 
-interface ExternalDBMock {
+interface MockScoreDB {
     int getValue(String key);
+
+    Boolean writeScoreDB(String word, Double score);
 }

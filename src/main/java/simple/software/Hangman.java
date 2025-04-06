@@ -20,6 +20,14 @@ public class Hangman {
     public int remainingTrials;
     public int score;
 
+    MockScoreDB externalDBMock;
+
+    public Hangman(MockScoreDB externalDBMock) {
+        this.externalDBMock = externalDBMock;
+    }
+
+    public Hangman() {
+    }
 
     public int countCharactersInAWord(String word, char alphabetCharacter) {
         return (int) word.chars()

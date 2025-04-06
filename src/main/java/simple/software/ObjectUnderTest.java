@@ -1,9 +1,9 @@
 package simple.software;
 
 public class ObjectUnderTest {
-    ExternalDBMock mockObject;
+    MockScoreDB mockObject;
 
-    public ObjectUnderTest(ExternalDBMock mockObject) {
+    public ObjectUnderTest(MockScoreDB mockObject) {
         this.mockObject = mockObject;
     }
 
